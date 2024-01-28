@@ -8,7 +8,7 @@ CORS(app, resources={r"/*": {"origins": "https://todo-list-typescript-git-feat-t
 def index():
   return render_template('index.html')
 
-@app.route('/api/print')
+@app.route('/print')
 @cross_origin()
 def print_hello():
   return("hello")
