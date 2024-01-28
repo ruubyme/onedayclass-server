@@ -66,7 +66,7 @@ app.register_blueprint(user_info_blueprint)
 app.register_blueprint(instructor_blueprint)
 app.register_blueprint(review_blueprint)
 
-@app.route('/print')
+@app.route('/api/print')
 @cross_origin()
 def print_hello():
   return("hello")
