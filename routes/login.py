@@ -54,7 +54,6 @@ def login():
     return jsonify({'status': 'error','message': repr(e)})
   finally:
     cur.close()
-    conn.close()
   
 #로그아웃 API 
 @login_blueprint.route('/api/logout')
