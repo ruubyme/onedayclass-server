@@ -16,6 +16,7 @@ def conn_mysqldb():
       user=os.getenv('DB_USER'),
       passwd=os.getenv('DB_PASSWORD'),
       database=os.getenv('DB_NAME'),
+      ssl_mode = "VERIFY_IDENTITY",
       ssl_verify_identity=True,
       ssl_ca=os.getenv('SSL'),
       charset='utf8mb4',
