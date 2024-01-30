@@ -9,6 +9,7 @@ from flask import g, current_app
 load_dotenv('.env.local')
 
 def conn_mysqldb():
+  print(os.getenv('DB_HOST'))
   if 'db' not in g or not g.db.is_connected():
     g.db = pymysql.connect(
       host = os.getenv('DB_HOST'),
