@@ -16,11 +16,11 @@ def conn_mysqldb():
       user=os.getenv('DB_USER'),
       passwd=os.getenv('DB_PASSWORD'),
       database=os.getenv('DB_NAME'),
-      ssl={
-                'cert': os.getenv('SSL'),
-                'ssl_mode': 'VERIFY_IDENTITY'
-            },
-      charset='utf8mb4',
+    #   ssl={
+    #             'cert': os.getenv('SSL'),
+    #             'ssl_mode': 'VERIFY_IDENTITY'
+    #         },
+    #   charset='utf8mb4',
     )
     conn, cur = g.db, g.db.cursor(dictionary=True)
   return conn, cur
