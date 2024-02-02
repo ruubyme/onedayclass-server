@@ -25,7 +25,7 @@ def conn_mysqldb():
 def close_db(e=None):
   db = g.pop('db', None)
   
-  if db is not None and db.is_connected():
+  if db is not None and not db.closed:
     db.close()
     
 
