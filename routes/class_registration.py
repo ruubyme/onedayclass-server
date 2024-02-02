@@ -41,8 +41,6 @@ def classRegistration():
       error_msg = "Please fill in all required fields."
       return jsonify({'status': 'error', 'message': error_msg})
     
-    #db 연결 
-    conn, cur = conn_mysqldb()
     #데이터베이스 저장 
     cur.execute("INSERT INTO class (class_name, description, location, instructor_id, cost, latitude, longitude, target_student, curriculum, content) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (class_name, description, location, instructor_id, cost, latitude, longitude, json.dumps(target_student), json.dumps(curriculum), content))
     conn.commit()
