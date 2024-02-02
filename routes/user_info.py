@@ -10,6 +10,7 @@ user_info_blueprint = Blueprint('user_info', __name__)
 #user 정보 얻어오기 API 
 @user_info_blueprint.route('/api/users/<user_id>', methods=['GET'])
 @jwt_required()
+@cross_origin()
 def get_user_info(user_id):
   try:
     conn, cur = conn_mysqldb()
@@ -33,6 +34,7 @@ def get_user_info(user_id):
 #회원정보수정 API
 @user_info_blueprint.route('/api/users/<user_id>', methods=['PATCH'])
 @jwt_required()
+@cross_origin()
 def edit_user_info(user_id):
   conn, cur = conn_mysqldb()
   data = request.get_json()

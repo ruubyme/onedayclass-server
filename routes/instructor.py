@@ -41,6 +41,7 @@ def get_classes_by_instructor():
     
 #클래스 삭제 
 @instructor_blueprint.route('/api/class', methods=['DELETE'])
+@cross_origin()
 def delete_class_by_instructor():
   instructor_id = request.args.get('instructor_id')
   class_id = request.args.get('class_id')
@@ -74,6 +75,7 @@ def delete_class_by_instructor():
     
 #클래스 수정 
 @instructor_blueprint.route('/api/class', methods=['PATCH'])
+@cross_origin()
 def update_class_by_instructor():
   instructor_id = request.json.get('instructor_id')
   class_id = request.json.get('class_id')

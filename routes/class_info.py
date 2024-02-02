@@ -20,6 +20,7 @@ def get_class_data_by_id(class_id):
 
 #get_class_addresses API 
 @class_info_blueprint.route('/api/class_addresses', methods=["GET"])
+@cross_origin()
 def get_class_addresses():
   try:
     #db 연결 
@@ -47,6 +48,7 @@ def get_class_addresses():
   
 #추가적인 수업 정보 API
 @class_info_blueprint.route('/api/class_additional_data/<class_id>', methods=['GET'])
+@cross_origin()
 def get_class_additional_data(class_id):
   try:
     #db연결 
@@ -77,6 +79,7 @@ def get_class_additional_data(class_id):
   
 #class_detail page에 필요한 데이터 조회 API 
 @class_info_blueprint.route('/api/get_class_detail/<class_id>', methods=["GET"])
+@cross_origin()
 def get_class_detail(class_id):
     classData = get_class_data_by_id(class_id)
     

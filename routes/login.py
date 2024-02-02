@@ -58,6 +58,7 @@ def login():
 #로그아웃 API 
 @login_blueprint.route('/api/logout')
 @login_required
+@cross_origin()
 def logout():
   session.clear() #세션 초기화
   logout_user()

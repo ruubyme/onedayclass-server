@@ -5,10 +5,11 @@ from flask_jwt_extended import JWTManager
 from flask_login import LoginManager
 from mysql import conn_mysqldb
 from control.user_mgmt import User 
+import os
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "https://onedayclass-frontend-euu7.vercel.app"}})
-
+app.secret_key= os.getenv('SECRET_KEY')
 @app.route('/')
 def index():
   return render_template('index.html')
@@ -17,7 +18,6 @@ def index():
 #세션 관련 설정 
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
 
 #jwtManager 초기화 
 jwt = JWTManager(app)

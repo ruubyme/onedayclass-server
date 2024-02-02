@@ -182,6 +182,7 @@ def gett_tid_by_payment_id(payment_id):
 
 #특정 클래스의 모든 예약날짜 가져오기
 @class_booking_blueprint.route('/api/class_dates/<class_id>', methods=['GET'])
+@cross_origin()
 def get_class_dates(class_id):
   conn, cur = conn_mysqldb()
   try:
@@ -201,6 +202,7 @@ def get_class_dates(class_id):
 #특정 유저가 예약한 예약정보 모두 가져오기
 @class_booking_blueprint.route('/api/class/<user_id>/booking', methods=['GET'])
 @jwt_required()
+@cross_origin()
 def get_class(user_id):
   conn, cur = conn_mysqldb()
   
@@ -263,6 +265,7 @@ def get_class(user_id):
     
 #class_date_id 로 예약한 예약자 명단 가져오기 
 @class_booking_blueprint.route('/api/<class_date_id>/attendees', methods=['GET'])
+@cross_origin()
 def get_attendees_by_class_date_id(class_date_id):
   conn, cur = conn_mysqldb()
   query = """
@@ -293,6 +296,7 @@ def get_attendees_by_class_date_id(class_date_id):
 #클래스 예약하기 
 @class_booking_blueprint.route('/api/class/booking', methods=['POST'])
 @jwt_required()
+@cross_origin()
 def book_class():
   conn, cur = conn_mysqldb()
   try:

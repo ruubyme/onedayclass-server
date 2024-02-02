@@ -2,27 +2,24 @@ import pymysql
 from dotenv import load_dotenv
 import os 
 from dbutils.pooled_db import PooledDB
-from flask import g, current_app
+from flask import g
 
 
 # .env.local 파일 로드
 load_dotenv('.env.local')
 
 def conn_mysqldb():
-  print(os.getenv('DB_HOST'))
+  print(os.getenv('MYSQLHOST'))
   if 'db' not in g or not g.db.is_connected():
     g.db = pymysql.connect(
-      host = os.getenv('DB_HOST'),
-      user=os.getenv('DB_USER'),
-      passwd=os.getenv('DB_PASSWORD'),
-      database=os.getenv('DB_NAME'),
-    #   ssl={
-    #             'cert': os.getenv('SSL'),
-    #             'ssl_mode': 'VERIFY_IDENTITY'
-    #         },
-    #   charset='utf8mb4',
+      host = os.getenv('MYSQLHOST'),
+      user= os.getenv('MYSQLUSER'),
+      passwd=os.getenv('MYSQLPASSWORD'),
+      database=os.getenv('MYSQLDATABASE'),
+      port=int(os.getenv('MYSQLPORT')),
+      charset='utf8mb4',
     )
-    conn, cur = g.db, g.db.cursor(dictionary=True)
+    conn, cur = g.db, g.db.cursor(pymysql.cursors.DictCursor)
   return conn, cur
 
 def close_db(e=None):
