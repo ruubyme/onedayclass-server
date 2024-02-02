@@ -10,7 +10,9 @@ load_dotenv('.env.local')
 
 def conn_mysqldb():
   print(os.getenv('MYSQLHOST'))
-  if 'db' not in g or g.db.closed:
+  try:
+    g.db.ping(reconnect=True)
+  except Exception as e:
     g.db = pymysql.connect(
       host = os.getenv('MYSQLHOST'),
       user= os.getenv('MYSQLUSER'),
@@ -25,7 +27,11 @@ def conn_mysqldb():
 def close_db(e=None):
   db = g.pop('db', None)
   
-  if db is not None and not db.closed:
-    db.close()
+  if db is not None:
+    try:
+      db.ping(reconnect=True)
+      db.close()
+    except Exception as e:
+      pass 
     
 
