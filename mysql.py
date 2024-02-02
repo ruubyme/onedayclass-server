@@ -10,7 +10,7 @@ load_dotenv('.env.local')
 
 def conn_mysqldb():
   print(os.getenv('MYSQLHOST'))
-  if 'db' not in g or not g.db.is_connected():
+  if 'db' not in g or g.db.closed:
     g.db = pymysql.connect(
       host = os.getenv('MYSQLHOST'),
       user= os.getenv('MYSQLUSER'),
