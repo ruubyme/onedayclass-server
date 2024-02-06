@@ -21,6 +21,7 @@ def conn_mysqldb():
       port=int(os.getenv('MYSQLPORT')),
       charset='utf8mb4',
     )
+    print("db connection error", str(e))
     conn, cur = g.db, g.db.cursor(pymysql.cursors.DictCursor)
   return conn, cur
 

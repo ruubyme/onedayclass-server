@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from mysql import conn_mysqldb
+from mysql import conn_mysqldb, close_db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import traceback
 from flask_cors import cross_origin
@@ -76,8 +76,8 @@ def get_class_dates_info(cur, class_id, student_id=None):
 
 #class_date_id로 class 정보 얻어오기
 def get_class_info_by_date_id(class_date_id):
+  conn, cur = conn_mysqldb()
   try:
-      conn, cur = conn_mysqldb()
       cur.execute("""
           SELECT * FROM class_dates WHERE id = %s
       """, (class_date_id,))
@@ -97,7 +97,7 @@ def get_class_info_by_date_id(class_date_id):
       raise
   finally:
       cur.close()
-      conn.close()
+      close_db()
 
 #결제 진행 시 데이터처리 
 def create_payment_record(user_id, class_date_id, amount):
@@ -115,7 +115,7 @@ def create_payment_record(user_id, class_date_id, amount):
       raise e
   finally:
       cur.close()
-      conn.close()
+      close_db()
       
 #결제 성공 후 데이터처리 
 def updated_booking_and_payment_status(class_date_id, payment_id):
@@ -141,13 +141,12 @@ def updated_booking_and_payment_status(class_date_id, payment_id):
       raise e
   finally:
       cur.close()
-      conn.close()
+      close_db()
       
 #tid 저장 
 def save_tid(payment_id, tid):
   conn, cur = conn_mysqldb()
   try:
-    conn, cur = conn_mysqldb()
     cur.execute("""
         UPDATE payment
         SET tid = %s
@@ -159,10 +158,10 @@ def save_tid(payment_id, tid):
       raise e
   finally:
       cur.close()
-      conn.close()
+      close_db()
       
 #tid 조회 
-def gett_tid_by_payment_id(payment_id):
+def get_tid_by_payment_id(payment_id):
   conn, cur = conn_mysqldb()
   try:
     cur.execute("""
@@ -177,7 +176,7 @@ def gett_tid_by_payment_id(payment_id):
       return None
   finally:
       cur.close()
-      conn.close()
+      close_db()
     
 
 #특정 클래스의 모든 예약날짜 가져오기
@@ -348,8 +347,8 @@ def book_class():
 @jwt_required()
 @cross_origin()
 def cancel_booking():
+  conn, cur = conn_mysqldb()
   try:
-    conn, cur = conn_mysqldb()
     student_id = get_jwt_identity()
     data = request.get_json()
     class_date_id = data['classDateId']
@@ -384,7 +383,6 @@ def cancel_booking():
 @cross_origin()
 def payment(class_date_id):
   user_id = get_jwt_identity()
-  
   class_info = get_class_info_by_date_id(class_date_id)
   if not class_info:
     return jsonify({"status": "error", "message": "Class not found"})
@@ -411,9 +409,9 @@ def payment(class_date_id):
       "quantity": 1,  # 상품 수량
       "total_amount": amount,  # 총 금액
       "tax_free_amount": 0,  # 비과세 금액
-      "approval_url": f"http://localhost:3000/payment/success/{class_date_id}",  # 결제 성공 시 리다이렉트 URL
-      "cancel_url": f"http://localhost:3000/payment/{class_date_id}",  # 결제 취소 시 리다이렉트 URL
-      "fail_url": f"http://localhost:3000/payment/{class_date_id}"  # 결제 실패 시 리다이렉트 URL
+      "approval_url": f"https://onedayclass-frontend-euu7.vercel.app/payment/success/{class_date_id}",  # 결제 성공 시 리다이렉트 URL
+      "cancel_url": f"https://onedayclass-frontend-euu7.vercel.app/payment/{class_date_id}",  # 결제 취소 시 리다이렉트 URL
+      "fail_url": f"https://onedayclass-frontend-euu7.vercel.app/payment/{class_date_id}"  # 결제 실패 시 리다이렉트 URL
   }
   
   response = requests.post("https://kapi.kakao.com/v1/payment/ready", headers=headers, data=params)
@@ -444,7 +442,7 @@ def payment_success(class_date_id):
   pg_token = data.get('pg_token')
   payment_id = data.get('paymentId')
   user_id = get_jwt_identity()
-  tid = gett_tid_by_payment_id(payment_id)
+  tid = get_tid_by_payment_id(payment_id)
   
   if not tid or not pg_token or not payment_id:
     return  jsonify({"status": "error", "message": "Required payment information is missing or invalid"})

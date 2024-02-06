@@ -107,34 +107,25 @@ def change_password(user_id):
       conn.close()
 
 #특정 user의 북마크 리스트 얻어오기      
-def get_bookmarkList(user_id):
-  try:
-    conn, cur = conn_mysqldb()
+def get_bookmarkList(user_id, cur):
+  cur.execute("SELECT * FROM user_bookmarks WHERE user_id = %s", (user_id,))
+  bookmarks = cur.fetchall()
+
+  detailed_bookmarks=[]
+  for bookmark in bookmarks:
+    #각 북마크의 class_id로 class 테이블에서 추가 정보 조회 
+    cur.execute("SELECT class_name, description FROM class WHERE id = %s", (bookmark['class_id'],))
+    class_info = cur.fetchone()
     
-    cur.execute("SELECT * FROM user_bookmarks WHERE user_id = %s", (user_id,))
-    bookmarks = cur.fetchall()
-  
-    detailed_bookmarks=[]
-    for bookmark in bookmarks:
-      #각 북마크의 class_id로 class 테이블에서 추가 정보 조회 
-      cur.execute("SELECT class_name, description FROM class WHERE id = %s", (bookmark['class_id'],))
-      class_info = cur.fetchone()
-      
-      detailed_bookmark = {
-        **bookmark,
-        'class_name': class_info['class_name'],
-        'class_description': class_info['description'],
-      }
-      
-      detailed_bookmarks.append(detailed_bookmark)
-    return detailed_bookmarks
-  
-  except Exception as e:
-    raise 
-  
-  finally:
-    cur.close()
-    conn.close()
+    detailed_bookmark = {
+      **bookmark,
+      'class_name': class_info['class_name'],
+      'class_description': class_info['description'],
+    }
+    
+    detailed_bookmarks.append(detailed_bookmark)
+  return detailed_bookmarks
+
   
 
 #특정 user의 북마크 조회하기 
@@ -143,12 +134,10 @@ def get_bookmarkList(user_id):
 @jwt_required()
 def get_bookmarks(user_id):
   class_id = request.args.get('classId', None) #선택적 파라미터 
-  
-  conn, cur = None, None 
+  conn, cur = conn_mysqldb()
   try: 
     #특정 클래스에 대한 북마크 정보 조회
     if class_id:
-      conn, cur = conn_mysqldb()
       cur.execute("SELECT * FROM user_bookmarks WHERE user_id = %s AND class_id = %s", (user_id, class_id))
       if cur.fetchone():
         bookmarkStatus = True 
@@ -158,7 +147,7 @@ def get_bookmarks(user_id):
     
     #유저의 모든 북마크 정보 조회 
     else:
-      bookmarks = get_bookmarkList(user_id)
+      bookmarks = get_bookmarkList(user_id, cur)
       
       return jsonify({"status": "success", "data": bookmarks})
   except Exception as e:
@@ -182,7 +171,7 @@ def add_bookmarks(user_id):
   try:
     cur.execute("INSERT INTO user_bookmarks (user_id, class_id) VALUES (%s, %s)", (user_id, class_id))
     conn.commit()
-    updated_bookmarks = get_bookmarkList(cur, user_id)
+    updated_bookmarks = get_bookmarkList(user_id, cur)
     return jsonify({'status': 'success', 'data': updated_bookmarks})
   
   except Exception as e:
@@ -201,7 +190,7 @@ def remove_bookmarks(user_id, class_id):
   try:
     cur.execute("DELETE FROM user_bookmarks WHERE user_id = %s AND class_id = %s", (user_id, class_id))
     conn.commit()
-    updated_bookmarks = get_bookmarkList(cur, user_id)
+    updated_bookmarks = get_bookmarkList(user_id, cur)
     
     return jsonify({'status': 'success', 'data': updated_bookmarks})
   
